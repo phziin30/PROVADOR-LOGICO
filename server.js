@@ -1,7 +1,6 @@
 const express = require('express');
-const app = express();
-app.use(express.json());
-app.use(express.static('public'));
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 
 function analiseLexica(formula) {
     const regex = /^[A-Z\s\(\)\~\^\v\→\↔]+$/;
