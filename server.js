@@ -1,11 +1,20 @@
 const express = require('express');
 const path = require('path');
-app.use(express.static(path.join(__dirname, 'public')));
-const path = require('path');
+
+const app = express(); 
+
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ROTA PRINCIPAL (resolve o erro Cannot GET /)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ===== LÓGICA =====
+
 function analiseLexica(formula) {
-    const regex = /^[A-Z\s\(\)\~\^\v\→\↔]+$/;
+    const regex = /^[A-Z\\s\\(\\)\\~\\^\\v\\→\\↔]+$/;
     return regex.test(formula);
 }
 
@@ -23,7 +32,7 @@ function parentesesBalanceados(formula) {
 
 function analiseSintatica(formula) {
     if (!parentesesBalanceados(formula)) return false;
-    const invalido = /[\^\v\→\↔]{2,}|[\^\v\→\↔]$|^[\^\v\→\↔]/;
+    const invalido = /[\\^\\v\\→\\↔]{2,}|[\\^\\v\\→\\↔]$|^[\\^\\v\\→\\↔]/;
     return !invalido.test(formula);
 }
 
