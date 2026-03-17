@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Provador Proposicional</title>
+<style>
+body {font-family: Arial;background:#f5f7fa;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;}
+.container {background:white;padding:30px;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.08);width:420px;text-align:center;}
+input {width:100%;padding:12px;margin-bottom:15px;}
+.buttons {display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+button {padding:10px;cursor:pointer;}
+.main-btn {margin-top:10px;background:#4a90e2;color:white;}
+#resultado {margin-top:15px;font-weight:bold;}
+.success {color:green;}
+.error {color:red;}
+table {margin-top:10px;}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Provador Lógico</h2>
+<input id="formula" placeholder="(A→B)^(B→A)">
+<div class="buttons">
+<button onclick="add('~')">∼</button>
+<button onclick="add('^')">∧</button>
+<button onclick="add('v')">∨</button>
+<button onclick="add('→')">→</button>
+<button onclick="add('↔')">↔</button>
+<button onclick="add('(')">(</button>
+<button onclick="add(')')">)</button>
+<button onclick="add('A')">A</button>
+<button onclick="add('B')">B</button>
+<button onclick="add('C')">C</button>
+</div>
+<button class="main-btn" onclick="testar()">Testar</button>
+<div id="resultado"></div>
+</div>
+
+<script>
+function add(v){document.getElementById('formula').value+=v;}
+
+async function testar(){
+ const formula=document.getElementById('formula').value;
+ const res=await fetch('/testar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({formula})});
+ const data=await res.json();
+
+ const r=document.getElementById('resultado');
+
+ if(data.erro){
+   r.innerHTML=data.erro;
+   r.className="error";
+   return;
+ }
+
+ r.innerHTML="<strong>"+data.classificacao+"</strong>";
+ gerarTabela(data.vars,data.resultados);
+}
+
+function gerarTabela(vars,resultados){
+ let html="<table border='1' style='width:100%;border-collapse:collapse'>";
+ html+="<tr>";
+ vars.forEach(v=>html+="<th>"+v+"</th>");
+ html+="<th>Resultado</th></tr>";
+
+ resultados.forEach(r=>{
+   html+="<tr>";
+   vars.forEach(v=>{
+     html+="<td>"+(r.valores[v]?"V":"F")+"</td>";
+   });
+   html+="<td>"+(r.resultado?"V":"F")+"</td>";
+   html+="</tr>";
+ });
+
+ html+="</table>";
+
+ document.getElementById("resultado").innerHTML+=html;
+}
+</script>
+</body>
+</html>
